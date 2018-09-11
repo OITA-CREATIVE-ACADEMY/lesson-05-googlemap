@@ -1,0 +1,35 @@
+
+.nav-pills {
+  margin-left: 20px;
+  margin-top: 20px;
+  padding-bottom: 5px;
+}
+
+#map {
+  height: 100%;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+hr{
+  padding-bottom:0;
+  margin-bottom:0;
+  height:0;
+  border:0;
+  border-top:2px solid #ccc;
+  border-bottom:1px solid #fff;
+}
+
+.delete-btn{
+  margin-left: 20px;
+  background-color:gray;
+  color:white;
+}
+
+.delete-btn:hover{
+  color:white;
+}
