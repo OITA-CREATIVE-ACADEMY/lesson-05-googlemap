@@ -1,7 +1,7 @@
 $(function() {
   setMap();
 
-  $('.nav-link.fovo').click(function(e) {
+  $('.nav-link.favo').click(function(e) {
     $('.modal-body ul li').remove();
     for (var id in localStorage) {
       var data = findFavo(id);
@@ -143,6 +143,7 @@ function nearbySearch(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
+      console.log(results)
       console.log(place);
       var id = place.id;
 
