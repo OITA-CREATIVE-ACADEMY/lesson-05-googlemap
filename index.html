@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+
+    <ul class="nav">
+      <li class="nav-item">
+        <a class="nav-link active fovo" href="#">お気に入り一覧</a>
+      </li>
+    </ul>
+    <div id="map"></div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">お気に入りに登録</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group">
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    var map;
+    var marker_array = [];
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        // clickableIcons Google Maps API で場所アイコンのポップアップ (POI) を消す (v3.26)
+        clickableIcons: false
+      });
+      // お気に入り保存された場所をマーカーで表示させる
+      for (var id in localStorage) {
+        var data = findFavo(id);
+        if (data) {
+          // 位置情報
+          var latlng = new google.maps.LatLng( data.lat , data.lng ) ;
+          // マーカーの新規出力
+          var marker = new google.maps.Marker({
+            map: map,
+            position: latlng,
+          });
+          marker_array[id] = marker;
+        }
+      }
+    }
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6BIqcPZMA1RslAKw389DOCv71KKaTfW8&libraries=places&callback=initMap"
+    async defer></script>
+
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/bootstrap/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
