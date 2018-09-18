@@ -10,7 +10,7 @@ $(function() {
       var data = findFavo(id);
       if (data) {
         console.log(data);
-        var li = createFavoLi(id, data,'badge-primary', data.lat, data.lng);
+        var li = createFavoLi(id, data.name,'badge-primary', data.lat, data.lng);
         $('.modal-body ul').append(li);
       }
     }
@@ -141,7 +141,8 @@ function deleteFavo(id, name) {
 
 function findFavo(id, name) {
   //localStrageから情報を持ってくる
-  return localStorage.getItem(id);
+  var jsonItem = localStorage.getItem(id);
+  return JSON.parse(jsonItem); //Jsonオブジェクトに帰る
 }
 
 
