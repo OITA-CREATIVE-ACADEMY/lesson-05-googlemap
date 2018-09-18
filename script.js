@@ -1,15 +1,13 @@
-
 $(function() {
 
   setMap();
 
-
   $('.nav-link.fovo').click(function(e) {
     $('.modal-body ul li').remove();
-    for (var id in localStorage) {    //localStrageの中のお気に入りidを取得
-      var data = findFavo(id);
+    for (var id in localStorage) {    //localStrageの中のお気に入りidを取得、forで繰り返し処理
+      var data = findFavo(id);　//id をキーにして得られた　findFavo関数からの戻り値　を"data"に入れる
       if (data) {
-        console.log(data);
+        console.log(data); //jsonオブジェクト
         var li = createFavoLi(id, data.name,'badge-primary', data.lat, data.lng);
         $('.modal-body ul').append(li);
       }
@@ -48,8 +46,11 @@ $(function() {
         icon: 'lib/map_icon.png'  //現在地のアイコン画像指定
       });
 
+      FavoShow();
+
       // クリックイベントを追加
       map.addListener('click', function(e) {
+        // console.log("緯度が出ます？"+ e.latitude);　//緯度・経度って別々に出せるのかな？
         var lat_lng = e.latLng;
 
         // 座標の中心をずらす
@@ -74,7 +75,7 @@ $(function() {
 
 
 $(document).on('click', '.modal-body ul a', function (e) {
-  var target = $(e.target);
+  var target = $(e.target); //$マークをつけて定義することで、Jqueryオブジェクトとして使うことができる
 
   var li = target.parent();
   var id = li.attr('data-id');  //liの中の"data-id"という属性を取ってきてidに入れる
@@ -105,7 +106,7 @@ function createFavoLi(id, name, favoClass, lat, lng) {
 
 //お気に入り追加
 function addFavo(id, name, lat, lng) {
-  //idの長さが0より大きく、nameの長さが0より大きい時?
+  // id,nameが存在するかどうかを判定（データが空だった場合などに、不正なデータを作らないようにする）
   if ( (id && 0 < id.length) && (name && 0 < name.length) ) {
     //地図情報をjson形式でまとめる
     var item = {
@@ -114,7 +115,7 @@ function addFavo(id, name, lat, lng) {
       'lng': lng
     }
 
-    //jsonをlocalstorageに保存するため、文字列に変換する
+    //jsonをlocalstorageに保存するため、文字列に変換する（jsonオブジェクトのままではlocalStorageに保存できない）
     var itemJson = JSON.stringify(item);
     //localstrageに、idとitemJsonを保存する
     localStorage.setItem(id, itemJson);
@@ -142,7 +143,7 @@ function deleteFavo(id, name) {
 function findFavo(id, name) {
   //localStrageから情報を持ってくる
   var jsonItem = localStorage.getItem(id);
-  return JSON.parse(jsonItem); //Jsonオブジェクトに帰る
+  return JSON.parse(jsonItem); //Jsonオブジェクトに変える
 }
 
 
@@ -177,3 +178,26 @@ function nearbySearch(results, status) {
     $('#exampleModal').modal('show')
   }
 }
+
+function FavoShow(){
+  console.log("FavoShow---------------");
+  for (var id in localStorage) {    //localStrageの中のお気に入りidを取得、forで繰り返し処理
+    var data = findFavo(id);　//id をキーにして得られた　findFavo関数からの戻り値（jsonオブジェクト）を"data"に入れる
+
+    if (data) { //dataの値 がある場合
+      console.log(data); //ここでは data はjsonオブジェクトです
+      var favo_lat = data.lat; //data の lat　をfavo_latに入れる
+      var favo_lng = data.lng; //data の lng　をfavo_lngに入れる
+      console.log(favo_lat);
+      console.log(favo_lng);
+
+      //位置情報
+      var latlng = new google.maps.LatLng(favo_lat, favo_lng); //favo_lat と favo_lng を元に位置情報を定義
+      //お気に入りに追加されている場所にマーカーを出す
+      var marker = new google.maps.Marker({
+        map: map,
+        position: latlng,
+      })
+    }
+  }
+};
