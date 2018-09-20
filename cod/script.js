@@ -6,7 +6,7 @@ $(function() {
       var data = findFavo(id);
       if (data) {
         console.log(data);
-        var li = createFavoLi(id, data.data2, data.data1, 'badge-primary');
+        var li = createFavoLi(id, data.data2, data.data1, data.data3, data.data4,'badge-primary');
         $('.modal-body ul').append(li);
       }
     }
@@ -29,16 +29,16 @@ function setMap() {
     var longitude = position.coords.longitude;
     // 位置情報
     var latlng = new google.maps.LatLng( latitude , longitude ) ;//位置座標のインスタンスを作成するためのクラス
-
+    
     map.panTo(latlng);//Mapクラスのメソッド,地図の位置座標を絶対的に移動できます
-
+    
     //現在地にマーカーの新規出力
     new google.maps.Marker( {
         map: map ,
         position: latlng ,
     });
     //クリックイベントを追加する
-  map.addListener('click', function(e) {
+    map.addListener('click', function(e) {
     console.log(e);
     var lat_lng = e.latLng;//クリックした座標を格納
     // 座標の中心をずらす
@@ -62,13 +62,15 @@ $(document).on('click', '.modal-body ul a', function (e) {
   console.log(target);
   var li = target.parent();
   var id = li.attr('data-id');//idを取得
+  var lng = li.attr('data-lng');
+  var lat = li.attr('data-lat');
   var icon = li.children('img').attr('src');//placeのアイコンを取得
   var name = li.find('.name').html();//placeの名前を取得
   if (target.hasClass('badge-light')) {
     target.removeClass('badge-light')
     target.addClass('badge-primary')
 
-    addFavo(id, name, icon);
+    addFavo(id, name, icon, lng ,lat);
   } else {
     target.removeClass('badge-primary')
     target.addClass('badge-light')
@@ -81,9 +83,12 @@ function callback(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
-      console.log("nearbySearchで帰ってくるplace情報↓");
       console.log(place);
       var id = place.id;
+      var name = place.name;
+      var icon  = place.icon;
+      var longitude = place.geometry.location.lng();
+      var latitude = place.geometry.location.lat();
 
       var favoClass = '';
       if (findFavo(id)) {
@@ -92,7 +97,8 @@ function callback(results, status) {
       } else {
         favoClass = 'badge-light';
       }
-      var li = createFavoLi(id, place.icon, place.name, favoClass);
+      var li = createFavoLi(id, icon, name, longitude, latitude, favoClass);
+      console.log(li);
       $('.modal-body ul').append(li);//モーダルに施設を追加
     }
     $('modal-title').html('登録');
@@ -100,22 +106,38 @@ function callback(results, status) {
   }
 }
 //-----------------------favo関連---------------------------//
-function createFavoLi(id, icon,name, favoClass) {
-  return $('<li data-id=' + id + ' class="list-group-item d-flex justify-content-between align-items-center"><img src="'+icon+'"><span class="name">' + name + '</span><a href="#" class="badge ' + favoClass + '">favorite</a></li>')
+function createFavoLi(id, icon, name, lng, lat, favoClass) {
+  return $('<li data-id=' + id + ' data-lng=' + lng + ' data-lat=' + lat + ' class="list-group-item d-flex justify-content-between align-items-center"><img src="'+icon+'"><span class="name">' + name + '</span><a href="#" class="badge ' + favoClass + '">favorite</a></li>')
 }
-function addFavo(id, name, icon) {
+function addFavo(id, name, icon, lng ,lat) {
   if ( (id && 0 < id.length) && (name && 0 < name.length) ) {
     var datalist = {
       data1: name,
-      data2: icon
+      data2: icon,
+      data3: lng,
+      data4: lat
   }
     var jsondata = JSON.stringify(datalist);//JSON形式のデータを文字列に変換
     localStorage.setItem(id,jsondata);//localStorageにセット
+
+    // 位置情報
+    var latlng = new google.maps.LatLng(lat, lng);
+    // お気に入りに追加した場所にマーカーを出力
+    var marker = new google.maps.Marker({
+      map: map,
+      position: latlng,
+    });
+    // 表示させたマーカーを保存
+    marker_array[id] = marker;
+
   }
 }
 function deleteFavo(id, name) {
   if ( (id && 0 < id.length) && (name && 0 < name.length) ) {
     localStorage.removeItem(id);
+
+    var marker = marker_array[id];
+    marker.setMap(null);
   }
 }
 function findFavo(id, name) {
